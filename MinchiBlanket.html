@@ -10,7 +10,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* border: 1px solid darkblue; */
+            border: 1px solid darkblue;
         }
 
         #outer-trim{
@@ -45,19 +45,32 @@
             /* border: 1px solid green; */
         }
 
+        #commands{
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .colorPaletteElements{
+            border: 1px solid green;
+        }
+
     </style>
 </head>
 <body>
     
     <div id="blanket"></div>
+    <div id="commands"></div>
 
     <script>
 
         // base variables
+        let ifBorders = 0; // if borders are present, then value is 2
         let squareSide = 55;
         let trimWidth = Math.round(squareSide / 5);
-        let coreWidth = 5 * (squareSide + 2);
-        let coreHeight = 8 * (squareSide + 2);
+        let coreWidth = 5 * (squareSide + ifBorders);
+        let coreHeight = 8 * (squareSide + ifBorders);
         let innerTrimWidth = coreWidth + 2 * trimWidth;
         let innerTrimHeight = coreHeight + 2 * trimWidth;
         let middleTrimWidth = innerTrimWidth + 2 * trimWidth;
@@ -78,6 +91,8 @@
         let bc5 = "#e5aaa4";
         // let bc6 = "rgb (211, 80, 130)";
         let bc6 = "#d35082";
+        let rand = 0;
+        let activeColor = 0;
 
         // catches blanket (container div)
         let blanket = document.getElementById("blanket");
@@ -87,7 +102,8 @@
         outerTrim.style.width = outerTrimWidth + "px";
         outerTrim.style.height = outerTrimHeight + "px";
         outerTrim.setAttribute("id", "outer-trim");
-        outerTrim.style.backgroundColor = setBackgroundColor();
+        rand = Math.floor(Math.random() * 6 + 1);
+        outerTrim.style.backgroundColor = setBackgroundColor(rand);
         // append to parent element (blanket)
         blanket.appendChild(outerTrim);
 
@@ -96,7 +112,8 @@
         middleTrim.style.width = middleTrimWidth + "px";
         middleTrim.style.height = middleTrimHeight + "px";
         middleTrim.setAttribute("id", "middle-trim");
-        middleTrim.style.backgroundColor = setBackgroundColor();
+        rand = Math.floor(Math.random() * 6 + 1);
+        middleTrim.style.backgroundColor = setBackgroundColor(rand);
         // append to parent element (outerTrim)
         outerTrim.appendChild(middleTrim);
 
@@ -105,7 +122,8 @@
         innerTrim.style.width = innerTrimWidth + "px";
         innerTrim.style.height = innerTrimHeight + "px";
         innerTrim.setAttribute("id", "inner-trim");
-        innerTrim.style.backgroundColor = setBackgroundColor();
+        rand = Math.floor(Math.random() * 6 + 1);
+        innerTrim.style.backgroundColor = setBackgroundColor(rand);
         // append to parent element (middleTrim)
         middleTrim.appendChild(innerTrim);
         
@@ -124,7 +142,8 @@
             tempSq.style.width = squareSide + "px";
             tempSq.style.height = squareSide + "px";
             blanketCore.appendChild(tempSq);
-            tempSq.style.backgroundColor = setBackgroundColor();
+            rand = Math.floor(Math.random() * 6 + 1);
+            tempSq.style.backgroundColor = setBackgroundColor(rand);
             //setBackgroundColor(tempSq);
 
             // adds class 'squares' to square
@@ -132,10 +151,10 @@
             tempSq.setAttribute("id", "square-" + i);
         }
 
-        function setBackgroundColor() {
-            let rand = Math.floor(Math.random() * 6 + 1);
+        function setBackgroundColor(numb) {
+
             let placeholder;
-            switch (rand) {
+            switch (numb) {
                 case 1:
                     placeholder = bc1;
                     break;
@@ -160,6 +179,50 @@
             }
             return placeholder;
         }
+
+
+        // catch commands panel
+        let commands = document.getElementById("commands");
+
+        // create 6 divs for set colors
+        for (let i = 1; i < 7; i++) {
+
+            let tempPalette = document.createElement("div");
+            tempPalette.style.width = squareSide+ "px";
+            tempPalette.style.height = squareSide + "px";
+            tempPalette.classList.add("colorPaletteElements");
+            tempPalette.setAttribute("id", "palette-" + i);
+            commands.appendChild(tempPalette);
+            tempPalette.style.backgroundColor = setBackgroundColor(i);
+        }
+
+        // check for user activity anywhere on the blanket
+        outerTrim.addEventListener("click", function (e) {
+            
+            e.target.style.backgroundColor = setBackgroundColor(activeColor);
+        });
+
+        // check for user selection of active color
+        commands.addEventListener("click", function (e) {
+            
+            clearSelectionOnPalettes();
+
+            // takes element id in textual form and shaves of all non-digits
+            let textualID = e.target.id.replace(/[^0-9]/g, "");
+            // parses number in string form into integer
+            activeColor = parseInt(textualID);
+            e.target.style.outline = "thick solid #ff0000";
+        });
+
+        // clear all selection on palettes
+        function clearSelectionOnPalettes() {
+            
+            for (let i = 1; i < 7; i++) {
+    
+                document.getElementById("palette-" + i).style.outline = "";
+            }
+        }
+
 
     </script>
 
